@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   fetchAttendance,
   createAttendance,
+  deleteAttendance,
   type Attendance,
   type AttendancePayload,
 } from '../api/attendance';
@@ -44,6 +45,11 @@ export default function Employees() {
     });
   }
 
+  async function handleDelete(id: string) {
+    await deleteAttendance(id);
+    setAttendance(prev => prev.filter(a => a._id !== id));
+  }
+
   if (loading) return <p>Loading...</p>;
 
   return (
@@ -84,8 +90,23 @@ export default function Employees() {
 
       <ul>
         {attendance.map((a) => (
-          <li key={a._id}>
+          <li key={a._id} style={{ marginBottom: '8px' }}>
             {a.employeeName} — {a.date} ({a.startTime} - {a.endTime})
+
+            <button
+              onClick={() => handleDelete(a._id)}
+              style={{
+                marginLeft: '12px',
+                padding: '4px 10px',
+                fontSize: '12px',
+                backgroundColor: '#1e1e1e',
+                color: '#ff4d4f',
+                border: '1px solid #ff4d4f',
+                cursor: 'pointer'
+              }}
+            >
+              DELETE
+            </button>
           </li>
         ))}
       </ul>
