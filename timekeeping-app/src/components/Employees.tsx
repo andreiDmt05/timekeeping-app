@@ -10,6 +10,7 @@ import {
 export default function Employees() {
   const [attendance, setAttendance] = useState<Attendance[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<string[]>([]);
 
   const [form, setForm] = useState<AttendancePayload>({
     employeeName: '',
@@ -48,6 +49,23 @@ export default function Employees() {
   async function handleDelete(id: string) {
     await deleteAttendance(id);
     setAttendance(prev => prev.filter(a => a._id !== id));
+    setSelected(prev => prev.filter(item => item !== id));
+  }
+
+  function toggleSelect(id: string) {
+    setSelected(prev =>
+      prev.includes(id)
+        ? prev.filter(item => item !== id)
+        : [...prev, id]
+    );
+  }
+
+  function selectAll() {
+    setSelected(attendance.map(a => a._id));
+  }
+
+  function deselectAll() {
+    setSelected([]);
   }
 
   if (loading) return <p>Loading...</p>;
@@ -88,9 +106,26 @@ export default function Employees() {
         <button type="submit">Adaugă pontaj</button>
       </form>
 
+      <div style={{ margin: '20px 0' }}>
+        <button onClick={selectAll} style={{ marginRight: '10px' }}>
+          Selectează tot
+        </button>
+
+        <button onClick={deselectAll}>
+          Debifează tot
+        </button>
+      </div>
+
       <ul>
         {attendance.map((a) => (
           <li key={a._id} style={{ marginBottom: '8px' }}>
+            <input
+              type="checkbox"
+              checked={selected.includes(a._id)}
+              onChange={() => toggleSelect(a._id)}
+              style={{ marginRight: '8px' }}
+            />
+
             {a.employeeName} — {a.date} ({a.startTime} - {a.endTime})
 
             <button
